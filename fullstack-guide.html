@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Full-Stack Dev — A Beginner's Field Guide (.NET / C# / SQL)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&family=Inter+Tight:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- Design tokens ---------- */
+:root{
+  --bg:#0e0d0b;             /* deep warm black */
+  --bg-soft:#171511;
+  --paper:#f5efe2;          /* aged paper */
+  --ink:#1a1814;
+  --ink-soft:#4a443a;
+  --accent:#ff5b1f;         /* burnt orange */
+  --accent-2:#3a8a5c;       /* moss green */
+  --accent-3:#e7c64a;       /* mustard */
+  --line:#2a2723;
+  --code-bg:#13110d;
+  --code-fg:#f0e8d6;
+  --kw:#ff8a4c;             /* keyword */
+  --str:#9bd07a;            /* string */
+  --com:#7a6f5c;            /* comment */
+  --num:#e7c64a;            /* number */
+  --typ:#7fb6e6;            /* type */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter Tight', sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+  /* paper texture using subtle gradient noise */
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(255,91,31,0.05), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(58,138,92,0.05), transparent 40%);
+}
+
+/* ---------- Layout ---------- */
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{position:static!important;height:auto!important}}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--bg);color:var(--paper);
+  padding:2rem 1.5rem;border-right:1px solid var(--line);
+}
+.brand{font-family:'Fraunces',serif;font-weight:800;font-size:1.6rem;line-height:1.05;margin-bottom:.4rem}
+.brand .dot{color:var(--accent)}
+.brand-sub{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:#8a8275;margin-bottom:2rem}
+.nav-title{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#6b6557;margin:1.5rem 0 .6rem}
+.nav a{
+  display:block;color:#d8d2c2;text-decoration:none;
+  font-size:.92rem;padding:.45rem .6rem;border-radius:6px;
+  border-left:2px solid transparent;transition:all .2s;
+}
+.nav a:hover{background:var(--bg-soft);color:var(--accent-3);border-left-color:var(--accent)}
+
+/* ---------- Main ---------- */
+main{padding:3rem 4rem;max-width:1100px}
+@media(max-width:900px){main{padding:1.5rem}}
+
+/* ---------- Hero ---------- */
+.hero{
+  border-bottom:1px solid var(--line);
+  padding-bottom:3rem;margin-bottom:3rem;position:relative;
+}
+.hero::before{
+  content:"01";position:absolute;top:-1rem;right:0;
+  font-family:'Fraunces',serif;font-size:8rem;font-weight:800;
+  color:var(--accent);opacity:.12;line-height:1;
+}
+.eyebrow{
+  display:inline-block;font-size:.7rem;letter-spacing:.25em;
+  text-transform:uppercase;background:var(--ink);color:var(--paper);
+  padding:.4rem .8rem;border-radius:2px;margin-bottom:1.2rem;
+}
+h1{
+  font-family:'Fraunces',serif;font-weight:800;
+  font-size:clamp(2.5rem,6vw,4.8rem);line-height:1;
+  letter-spacing:-.02em;margin-bottom:1rem;
+}
+h1 em{font-style:italic;color:var(--accent);font-weight:400}
+.lead{font-size:1.15rem;max-width:60ch;color:var(--ink-soft)}
+
+/* ---------- Sections ---------- */
+section{padding:3rem 0;border-bottom:1px dashed var(--line)}
+section:last-child{border-bottom:none}
+h2{
+  font-family:'Fraunces',serif;font-weight:600;
+  font-size:2.4rem;margin-bottom:.4rem;letter-spacing:-.01em;
+}
+h2 .num{
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  color:var(--accent);font-weight:600;display:block;margin-bottom:.4rem;
+  letter-spacing:.1em;
+}
+h3{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;margin:1.8rem 0 .8rem}
+h4{font-size:1rem;font-weight:700;margin:1.2rem 0 .5rem;color:var(--ink)}
+p{margin-bottom:1rem}
+ul,ol{margin:.5rem 0 1rem 1.5rem}
+li{margin-bottom:.4rem}
+strong{color:var(--ink);font-weight:700}
+
+/* ---------- Cards & callouts ---------- */
+.card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:4px;padding:1.5rem;margin:1rem 0;
+  box-shadow:4px 4px 0 var(--ink);
+}
+.callout{
+  border-left:4px solid var(--accent);
+  background:rgba(255,91,31,0.06);
+  padding:1rem 1.2rem;margin:1.2rem 0;border-radius:0 4px 4px 0;
+}
+.callout.tip{border-color:var(--accent-2);background:rgba(58,138,92,0.08)}
+.callout.warn{border-color:var(--accent-3);background:rgba(231,198,74,0.12)}
+.callout-label{
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:700;margin-bottom:.4rem;
+}
+
+/* ---------- Code blocks ---------- */
+pre{
+  background:var(--code-bg);color:var(--code-fg);
+  padding:1.2rem 1.4rem;border-radius:4px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:.85rem;
+  line-height:1.55;margin:1rem 0;border:1px solid var(--line);
+  position:relative;
+}
+pre .lang{
+  position:absolute;top:.5rem;right:.8rem;
+  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  color:#6b6557;
+}
+code{
+  font-family:'JetBrains Mono',monospace;font-size:.85em;
+  background:rgba(26,24,20,0.08);padding:.1rem .35rem;border-radius:3px;
+}
+pre code{background:none;padding:0;font-size:inherit}
+.kw{color:var(--kw)}
+.str{color:var(--str)}
+.com{color:var(--com);font-style:italic}
+.num{color:var(--num)}
+.typ{color:var(--typ)}
+
+/* ---------- Tabs ---------- */
+.tabs{margin:1.5rem 0;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#fff}
+.tab-buttons{display:flex;background:var(--ink);border-bottom:1px solid var(--line)}
+.tab-btn{
+  flex:1;padding:.7rem 1rem;background:none;border:none;
+  color:#a8a195;font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  cursor:pointer;letter-spacing:.05em;transition:all .2s;
+  border-right:1px solid var(--line);
+}
+.tab-btn:last-child{border-right:none}
+.tab-btn:hover{color:var(--paper)}
+.tab-btn.active{background:var(--accent);color:#fff}
+.tab-content{display:none;padding:0}
+.tab-content.active{display:block}
+.tab-content pre{margin:0;border:none;border-radius:0}
+
+/* ---------- Stack diagram ---------- */
+.stack{display:grid;gap:.8rem;margin:1.5rem 0}
+.stack-layer{
+  padding:1.2rem 1.5rem;border:2px solid var(--ink);
+  background:#fff;display:flex;align-items:center;gap:1rem;
+  position:relative;transition:transform .2s;
+}
+.stack-layer:hover{transform:translateX(8px)}
+.stack-layer .icon{
+  width:48px;height:48px;display:grid;place-items:center;
+  font-family:'Fraunces',serif;font-weight:800;font-size:1.4rem;
+  background:var(--ink);color:var(--paper);border-radius:50%;flex-shrink:0;
+}
+.stack-layer.frontend{border-color:var(--accent)}
+.stack-layer.frontend .icon{background:var(--accent)}
+.stack-layer.backend{border-color:var(--accent-2)}
+.stack-layer.backend .icon{background:var(--accent-2)}
+.stack-layer.db{border-color:var(--accent-3)}
+.stack-layer.db .icon{background:var(--accent-3);color:var(--ink)}
+.stack-layer h4{margin:0 0 .2rem}
+.stack-layer p{margin:0;font-size:.9rem;color:var(--ink-soft)}
+
+/* ---------- HTTP method pills ---------- */
+.http-table{width:100%;border-collapse:collapse;margin:1rem 0;background:#fff}
+.http-table th,.http-table td{
+  padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--line);
+}
+.http-table th{background:var(--ink);color:var(--paper);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+.method{
+  display:inline-block;padding:.2rem .6rem;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;color:#fff;
+}
+.method.get{background:#3a8a5c}
+.method.post{background:#ff5b1f}
+.method.put{background:#e7c64a;color:var(--ink)}
+.method.del{background:#c43c3c}
+
+/* ---------- Status code grid ---------- */
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin:1rem 0}
+.status{
+  padding:1rem;background:#fff;border-left:4px solid var(--ink);
+}
+.status.ok{border-color:#3a8a5c}
+.status.client{border-color:var(--accent-3)}
+.status.server{border-color:#c43c3c}
+.status .code{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;display:block}
+.status .desc{font-size:.85rem;color:var(--ink-soft)}
+
+/* ---------- SQL playground ---------- */
+.sql-play{
+  background:var(--ink);color:var(--paper);padding:1.5rem;
+  border-radius:4px;margin:1.5rem 0;
+}
+.sql-play h4{color:var(--paper);margin-top:0}
+.sql-play textarea{
+  width:100%;min-height:80px;background:var(--code-bg);color:var(--code-fg);
+  border:1px solid var(--line);padding:.8rem;font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;border-radius:3px;resize:vertical;
+}
+.sql-play button{
+  background:var(--accent);color:#fff;border:none;padding:.6rem 1.4rem;
+  font-family:'JetBrains Mono',monospace;font-weight:600;cursor:pointer;
+  margin-top:.6rem;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;
+  font-size:.75rem;transition:all .2s;
+}
+.sql-play button:hover{background:#ff7340}
+.sql-result{
+  margin-top:1rem;background:#fff;color:var(--ink);
+  padding:1rem;border-radius:3px;font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;min-height:50px;
+}
+.sql-result table{width:100%;border-collapse:collapse}
+.sql-result th,.sql-result td{padding:.4rem .8rem;border-bottom:1px solid #eee;text-align:left}
+.sql-result th{background:#f0e8d6}
+.sql-error{color:#c43c3c}
+.sql-hint{font-size:.8rem;color:#a8a195;margin-top:.6rem;font-style:italic}
+
+/* ---------- Quiz ---------- */
+.quiz{background:#fff;border:2px solid var(--ink);padding:1.5rem;margin:1.5rem 0;box-shadow:6px 6px 0 var(--accent)}
+.quiz-q{font-weight:700;margin-bottom:.8rem}
+.quiz-opt{
+  display:block;width:100%;text-align:left;background:var(--paper);
+  border:1px solid var(--line);padding:.7rem 1rem;margin:.4rem 0;
+  cursor:pointer;font-family:inherit;font-size:.95rem;transition:all .15s;
+}
+.quiz-opt:hover{background:#ebe4d2;transform:translateX(4px)}
+.quiz-opt.correct{background:#9bd07a;border-color:#3a8a5c;color:var(--ink)}
+.quiz-opt.wrong{background:#f5b8b8;border-color:#c43c3c}
+.quiz-feedback{margin-top:.8rem;font-size:.9rem;font-weight:600;min-height:1.2em}
+
+/* ---------- Expandable ---------- */
+details{
+  background:#fff;border:1px solid var(--line);padding:1rem 1.2rem;
+  margin:.8rem 0;border-radius:3px;
+}
+details summary{
+  cursor:pointer;font-weight:600;font-family:'Fraunces',serif;
+  font-size:1.05rem;list-style:none;display:flex;align-items:center;gap:.6rem;
+}
+details summary::before{content:"+";color:var(--accent);font-weight:800;transition:transform .2s}
+details[open] summary::before{content:"−"}
+details > *:not(summary){margin-top:.8rem}
+
+/* ---------- Footer ---------- */
+footer{
+  background:var(--bg);color:#a8a195;padding:2.5rem 4rem;
+  text-align:center;font-size:.85rem;
+}
+footer .accent{color:var(--accent-3)}
+
+/* ---------- Animations ---------- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.hero,section{animation:fadeUp .6s ease-out}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">FULL<span class="dot">·</span>STACK<br>FIELD GUIDE</div>
+    <div class="brand-sub">A Beginner's Manual</div>
+
+    <div class="nav-title">Foundations</div>
+    <nav class="nav">
+      <a href="#what">01 — What is Full-Stack?</a>
+      <a href="#stack">02 — The Three Layers</a>
+      <a href="#http">03 — How the Web Talks (HTTP)</a>
+    </nav>
+
+    <div class="nav-title">Frontend</div>
+    <nav class="nav">
+      <a href="#html">04 — HTML, CSS, JS</a>
+      <a href="#fetch">05 — Calling APIs from the Browser</a>
+    </nav>
+
+    <div class="nav-title">Backend (.NET / C#)</div>
+    <nav class="nav">
+      <a href="#dotnet">06 — ASP.NET Core Basics</a>
+      <a href="#controller">07 — Controllers & Routing</a>
+      <a href="#di">08 — Dependency Injection</a>
+    </nav>
+
+    <div class="nav-title">Database</div>
+    <nav class="nav">
+      <a href="#sql">09 — SQL Fundamentals</a>
+      <a href="#joins">10 — Joins & Relationships</a>
+      <a href="#playground">11 — SQL Playground</a>
+      <a href="#ef">12 — Entity Framework Core</a>
+    </nav>
+
+    <div class="nav-title">Bring it together</div>
+    <nav class="nav">
+      <a href="#project">13 — Mini Project: Todo API</a>
+      <a href="#quiz">14 — Test Yourself</a>
+      <a href="#next">15 — What to Learn Next</a>
+    </nav>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <!-- HERO -->
+    <header class="hero" id="intro">
+      <span class="eyebrow">A field guide · 2026 edition</span>
+      <h1>Full-stack, <em>without the fog.</em></h1>
+      <p class="lead">A practical walk through everything a beginner needs to build a real web app — frontend, backend in <strong>.NET / C#</strong>, and a <strong>SQL</strong> database. With examples you can read, run, and remember.</p>
+    </header>
+
+    <!-- ============ 01 WHAT IS FULL-STACK ============ -->
+    <section id="what">
+      <h2><span class="num">// 01</span>What does "full-stack" actually mean?</h2>
+      <p>A web application has <strong>three jobs</strong> happening at the same time:</p>
+      <ol>
+        <li>Show something pretty in the browser <em>(frontend)</em></li>
+        <li>Run logic, rules, and security on a server <em>(backend)</em></li>
+        <li>Remember things between visits <em>(database)</em></li>
+      </ol>
+      <p>A <strong>full-stack developer</strong> is someone who can work across all three. You don't need to be an expert in every layer — you need to understand how they talk to each other.</p>
+
+      <div class="callout tip">
+        <div class="callout-label">★ Mental model</div>
+        Think of a restaurant. The <strong>menu and dining room</strong> = frontend. The <strong>kitchen</strong> = backend. The <strong>pantry/fridge</strong> = database. The waiter carrying messages between them = HTTP.
+      </div>
+    </section>
+
+    <!-- ============ 02 THREE LAYERS ============ -->
+    <section id="stack">
+      <h2><span class="num">// 02</span>The three layers, visually</h2>
+
+      <div class="stack">
+        <div class="stack-layer frontend">
+          <div class="icon">F</div>
+          <div>
+            <h4>Frontend — what the user sees</h4>
+            <p>Runs in the <strong>browser</strong>. Built with HTML (structure), CSS (style), JavaScript (behavior). Frameworks: React, Vue, Angular, Blazor.</p>
+          </div>
+        </div>
+        <div class="stack-layer backend">
+          <div class="icon">B</div>
+          <div>
+            <h4>Backend — the rules and logic</h4>
+            <p>Runs on a <strong>server</strong>. Handles auth, validation, business rules. Built here with <strong>ASP.NET Core + C#</strong>. Exposes an HTTP API.</p>
+          </div>
+        </div>
+        <div class="stack-layer db">
+          <div class="icon">D</div>
+          <div>
+            <h4>Database — the memory</h4>
+            <p>Stores data permanently. We'll use <strong>SQL Server</strong> (or any relational DB). The backend talks to it; the frontend never does directly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-label">⚠ Critical rule</div>
+        The frontend <strong>never</strong> talks to the database directly. Always frontend → backend → database. This protects your data and lets you change either side without breaking the other.
+      </div>
+    </section>
+
+    <!-- ============ 03 HTTP ============ -->
+    <section id="http">
+      <h2><span class="num">// 03</span>How the web talks: HTTP</h2>
+      <p>Every interaction between frontend and backend is an <strong>HTTP request</strong>. The frontend asks; the backend answers. Each request has a <strong>method</strong> (the verb) and a <strong>URL</strong> (the noun).</p>
+
+      <table class="http-table">
+        <thead><tr><th>Method</th><th>Purpose</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get">GET</span></td><td>Read data</td><td><code>GET /api/todos</code></td></tr>
+          <tr><td><span class="method post">POST</span></td><td>Create new data</td><td><code>POST /api/todos</code></td></tr>
+          <tr><td><span class="method put">PUT</span></td><td>Update existing data</td><td><code>PUT /api/todos/5</code></td></tr>
+          <tr><td><span class="method del">DELETE</span></td><td>Remove data</td><td><code>DELETE /api/todos/5</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Status codes — the backend's reply</h3>
+      <p>Every response carries a number that says how it went:</p>
+      <div class="status-grid">
+        <div class="status ok"><span class="code">200 OK</span><span class="desc">Worked. Here's your data.</span></div>
+        <div class="status ok"><span class="code">201 Created</span><span class="desc">New thing was made.</span></div>
+        <div class="status client"><span class="code">400 Bad Request</span><span class="desc">Your input was wrong.</span></div>
+        <div class="status client"><span class="code">401 Unauthorized</span><span class="desc">You're not logged in.</span></div>
+        <div class="status client"><span class="code">404 Not Found</span><span class="desc">That thing doesn't exist.</span></div>
+        <div class="status server"><span class="code">500 Server Error</span><span class="desc">Backend crashed. Not your fault.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ 04 FRONTEND BASICS ============ -->
+    <section id="html">
+      <h2><span class="num">// 04</span>Frontend: HTML, CSS, JavaScript</h2>
+      <p>These three are the bones, skin, and brain of every webpage. Click each tab to see them in action — they all describe the same button.</p>
+
+      <div class="tabs" data-tabs>
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="t1-html">HTML — structure</button>
+          <button class="tab-btn" data-tab="t1-css">CSS — style</button>
+          <button class="tab-btn" data-tab="t1-js">JS — behavior</button>
+        </div>
+        <div class="tab-content active" id="t1-html">
+<pre><span class="lang">HTML</span><span class="com">&lt;!-- A button is just a tag with text inside --&gt;</span>
+&lt;<span class="kw">button</span> <span class="typ">id</span>=<span class="str">"saveBtn"</span>&gt;Save Todo&lt;/<span class="kw">button</span>&gt;</pre>
+        </div>
+        <div class="tab-content" id="t1-css">
+<pre><span class="lang">CSS</span><span class="com">/* Style the button: orange background, white text */</span>
+<span class="typ">#saveBtn</span> {
+  <span class="kw">background</span>: <span class="str">#ff5b1f</span>;
+  <span class="kw">color</span>: <span class="str">white</span>;
+  <span class="kw">padding</span>: <span class="num">10px</span> <span class="num">20px</span>;
+  <span class="kw">border</span>: <span class="str">none</span>;
+  <span class="kw">border-radius</span>: <span class="num">4px</span>;
+  <span class="kw">cursor</span>: <span class="str">pointer</span>;
+}</pre>
+        </div>
+        <div class="tab-content" id="t1-js">
+<pre><span class="lang">JavaScript</span><span class="com">// When the button is clicked, show an alert</span>
+<span class="kw">const</span> btn = document.<span class="typ">getElementById</span>(<span class="str">"saveBtn"</span>);
+btn.<span class="typ">addEventListener</span>(<span class="str">"click"</span>, () =&gt; {
+  <span class="kw">alert</span>(<span class="str">"Todo saved!"</span>);
+});</pre>
+        </div>
+      </div>
+
+      <details>
+        <summary>What about React, Angular, Blazor?</summary>
+        <p>These are <strong>frameworks</strong> built on top of HTML/CSS/JS. They make it easier to build big apps — but underneath, the browser still only understands the three basics. Learn vanilla first, then pick a framework.</p>
+        <p>If you're in the .NET world, <strong>Blazor</strong> lets you write frontend in C# instead of JavaScript. Worth exploring once comfortable with the basics.</p>
+      </details>
+    </section>
+
+    <!-- ============ 05 FETCH ============ -->
+    <section id="fetch">
+      <h2><span class="num">// 05</span>Calling the backend from the browser</h2>
+      <p>The frontend uses <code>fetch()</code> to send HTTP requests. Here's how to GET a list of todos and POST a new one:</p>
+
+      <div class="tabs" data-tabs>
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="t2-get">GET (read)</button>
+          <button class="tab-btn" data-tab="t2-post">POST (create)</button>
+        </div>
+        <div class="tab-content active" id="t2-get">
+<pre><span class="lang">JavaScript</span><span class="com">// Ask the backend for all todos</span>
+<span class="kw">async function</span> <span class="typ">loadTodos</span>() {
+  <span class="kw">const</span> response = <span class="kw">await</span> <span class="typ">fetch</span>(<span class="str">"/api/todos"</span>);
+  <span class="kw">const</span> todos = <span class="kw">await</span> response.<span class="typ">json</span>();   <span class="com">// parse JSON body</span>
+  console.<span class="typ">log</span>(todos);   <span class="com">// e.g. [{id:1, title:"Buy milk"}]</span>
+}</pre>
+        </div>
+        <div class="tab-content" id="t2-post">
+<pre><span class="lang">JavaScript</span><span class="com">// Send a new todo to the backend</span>
+<span class="kw">async function</span> <span class="typ">addTodo</span>(title) {
+  <span class="kw">const</span> response = <span class="kw">await</span> <span class="typ">fetch</span>(<span class="str">"/api/todos"</span>, {
+    method: <span class="str">"POST"</span>,                                <span class="com">// the verb</span>
+    headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> },
+    body: <span class="typ">JSON</span>.<span class="typ">stringify</span>({ title: title })  <span class="com">// payload as JSON</span>
+  });
+  <span class="kw">const</span> created = <span class="kw">await</span> response.<span class="typ">json</span>();
+  <span class="kw">return</span> created;
+}</pre>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">★ Key idea</div>
+        Data flows as <strong>JSON</strong> — a text format both JavaScript and C# understand. The backend turns C# objects into JSON; the frontend turns JSON into JS objects. Same shape, different language.
+      </div>
+    </section>
+
+    <!-- ============ 06 ASP.NET CORE ============ -->
+    <section id="dotnet">
+      <h2><span class="num">// 06</span>Backend with ASP.NET Core</h2>
+      <p><strong>ASP.NET Core</strong> is Microsoft's framework for building web APIs and apps in C#. It's free, cross-platform, and runs happily on your <strong>MacBook Pro M4</strong>.</p>
+
+      <h3>Setting up — the four commands you need</h3>
+<pre><span class="lang">terminal</span><span class="com"># 1. Check .NET is installed (should be 8 or later)</span>
+dotnet --version
+
+<span class="com"># 2. Create a new Web API project</span>
+dotnet new webapi -n TodoApi
+
+<span class="com"># 3. Move into it and run</span>
+cd TodoApi
+dotnet run
+
+<span class="com"># 4. Open the URL shown in the terminal (often https://localhost:5001) and append /swagger</span></pre>
+
+      <h3>The minimum file: <code>Program.cs</code></h3>
+<pre><span class="lang">C#</span><span class="com">// Program.cs — entry point of every ASP.NET Core app</span>
+<span class="kw">var</span> builder = <span class="typ">WebApplication</span>.CreateBuilder(args);
+
+<span class="com">// Register the services your app needs</span>
+builder.Services.AddControllers();           <span class="com">// enable controllers</span>
+builder.Services.AddEndpointsApiExplorer();  <span class="com">// for Swagger</span>
+builder.Services.AddSwaggerGen();
+
+<span class="kw">var</span> app = builder.Build();
+
+<span class="com">// Set up the request pipeline (middleware order matters)</span>
+<span class="kw">if</span> (app.Environment.IsDevelopment()) {
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
+app.MapControllers();   <span class="com">// hook up controller routes</span>
+
+app.Run();   <span class="com">// start the web server</span></pre>
+    </section>
+
+    <!-- ============ 07 CONTROLLERS ============ -->
+    <section id="controller">
+      <h2><span class="num">// 07</span>Controllers — where your endpoints live</h2>
+      <p>A <strong>controller</strong> is a C# class that handles HTTP requests for a specific resource. Each method = one endpoint.</p>
+
+<pre><span class="lang">C#</span><span class="com">// Controllers/TodosController.cs</span>
+<span class="kw">using</span> Microsoft.AspNetCore.Mvc;
+
+[<span class="typ">ApiController</span>]                           <span class="com">// marks this as a Web API controller</span>
+[<span class="typ">Route</span>(<span class="str">"api/[controller]"</span>)]              <span class="com">// URL becomes /api/todos</span>
+<span class="kw">public class</span> <span class="typ">TodosController</span> : <span class="typ">ControllerBase</span>
+{
+    <span class="com">// In-memory list (we'll swap for a real DB later)</span>
+    <span class="kw">private static</span> <span class="typ">List</span>&lt;<span class="typ">Todo</span>&gt; _todos = <span class="kw">new</span>() {
+        <span class="kw">new</span> <span class="typ">Todo</span> { Id = <span class="num">1</span>, Title = <span class="str">"Learn full-stack"</span> }
+    };
+
+    [<span class="typ">HttpGet</span>]                                <span class="com">// GET /api/todos</span>
+    <span class="kw">public</span> <span class="typ">IActionResult</span> GetAll() =&gt; Ok(_todos);
+
+    [<span class="typ">HttpGet</span>(<span class="str">"{id}"</span>)]                         <span class="com">// GET /api/todos/5</span>
+    <span class="kw">public</span> <span class="typ">IActionResult</span> GetOne(<span class="kw">int</span> id) {
+        <span class="kw">var</span> todo = _todos.FirstOrDefault(t =&gt; t.Id == id);
+        <span class="kw">return</span> todo == <span class="kw">null</span> ? NotFound() : Ok(todo);
+    }
+
+    [<span class="typ">HttpPost</span>]                               <span class="com">// POST /api/todos</span>
+    <span class="kw">public</span> <span class="typ">IActionResult</span> Create([<span class="typ">FromBody</span>] <span class="typ">Todo</span> input) {
+        input.Id = _todos.Count + <span class="num">1</span>;
+        _todos.Add(input);
+        <span class="kw">return</span> CreatedAtAction(nameof(GetOne), <span class="kw">new</span> { id = input.Id }, input);
+    }
+
+    [<span class="typ">HttpPut</span>(<span class="str">"{id}"</span>)]                         <span class="com">// PUT /api/todos/5</span>
+    <span class="kw">public</span> <span class="typ">IActionResult</span> Update(<span class="kw">int</span> id, [<span class="typ">FromBody</span>] <span class="typ">Todo</span> input) {
+        <span class="kw">var</span> existing = _todos.FirstOrDefault(t =&gt; t.Id == id);
+        <span class="kw">if</span> (existing == <span class="kw">null</span>) <span class="kw">return</span> NotFound();
+        existing.Title = input.Title;        <span class="com">// copy editable fields</span>
+        existing.IsDone = input.IsDone;
+        <span class="kw">return</span> NoContent();
+    }
+
+    [<span class="typ">HttpDelete</span>(<span class="str">"{id}"</span>)]                      <span class="com">// DELETE /api/todos/5</span>
+    <span class="kw">public</span> <span class="typ">IActionResult</span> Delete(<span class="kw">int</span> id) {
+        _todos.RemoveAll(t =&gt; t.Id == id);
+        <span class="kw">return</span> NoContent();
+    }
+}
+
+<span class="com">// The model — a plain C# class (sometimes called a POCO)</span>
+<span class="kw">public class</span> <span class="typ">Todo</span> {
+    <span class="kw">public int</span> Id { <span class="kw">get; set;</span> }
+    <span class="kw">public string</span> Title { <span class="kw">get; set;</span> } = <span class="str">""</span>;
+    <span class="kw">public bool</span> IsDone { <span class="kw">get; set;</span> }
+}</pre>
+
+      <details>
+        <summary>What does each attribute do?</summary>
+        <ul>
+          <li><code>[ApiController]</code> — turns on automatic JSON binding and 400 responses for bad input</li>
+          <li><code>[Route("api/[controller]")]</code> — <code>[controller]</code> is replaced by the class name minus "Controller", so <code>TodosController</code> → <code>/api/todos</code></li>
+          <li><code>[HttpGet]</code>, <code>[HttpPost]</code> etc — map a method to a verb</li>
+          <li><code>[FromBody]</code> — read the value from the request body (as JSON) instead of the URL</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- ============ 08 DI ============ -->
+    <section id="di">
+      <h2><span class="num">// 08</span>Dependency Injection — the .NET superpower</h2>
+      <p>Instead of creating objects with <code>new</code>, you ask ASP.NET Core for them. This makes code testable and swappable.</p>
+
+<pre><span class="lang">C#</span><span class="com">// Step 1: Define an interface (a contract)</span>
+<span class="kw">public interface</span> <span class="typ">ITodoService</span> {
+    <span class="typ">List</span>&lt;<span class="typ">Todo</span>&gt; GetAll();
+}
+
+<span class="com">// Step 2: Implement it</span>
+<span class="kw">public class</span> <span class="typ">TodoService</span> : <span class="typ">ITodoService</span> {
+    <span class="kw">public</span> <span class="typ">List</span>&lt;<span class="typ">Todo</span>&gt; GetAll() =&gt; <span class="com">/* fetch from DB */</span> <span class="kw">new</span>();
+}
+
+<span class="com">// Step 3: Register it in Program.cs</span>
+builder.Services.AddScoped&lt;<span class="typ">ITodoService</span>, <span class="typ">TodoService</span>&gt;();
+
+<span class="com">// Step 4: Use it in a controller (constructor injection)</span>
+<span class="kw">public class</span> <span class="typ">TodosController</span> : <span class="typ">ControllerBase</span> {
+    <span class="kw">private readonly</span> <span class="typ">ITodoService</span> _service;
+    <span class="kw">public</span> TodosController(<span class="typ">ITodoService</span> service) {
+        _service = service;   <span class="com">// .NET passes it in automatically</span>
+    }
+    [<span class="typ">HttpGet</span>]
+    <span class="kw">public</span> <span class="typ">IActionResult</span> GetAll() =&gt; Ok(_service.GetAll());
+}</pre>
+
+      <div class="callout tip">
+        <div class="callout-label">★ Three lifetimes</div>
+        <ul style="margin-bottom:0">
+          <li><strong>Singleton</strong> — one instance for the whole app</li>
+          <li><strong>Scoped</strong> — one per HTTP request <em>(most common)</em></li>
+          <li><strong>Transient</strong> — a new one every time it's asked for</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 09 SQL ============ -->
+    <section id="sql">
+      <h2><span class="num">// 09</span>SQL — talking to the database</h2>
+      <p>SQL is the language for relational databases. Data lives in <strong>tables</strong> (rows and columns, like a spreadsheet). Each table has a <strong>primary key</strong> — a unique ID per row.</p>
+
+      <h3>Creating a table</h3>
+<pre><span class="lang">SQL</span><span class="com">-- Create a Users table with three columns</span>
+<span class="kw">CREATE TABLE</span> Users (
+    Id        <span class="typ">INT</span> <span class="kw">PRIMARY KEY IDENTITY</span>(1,1),  <span class="com">-- auto-increment</span>
+    Name      <span class="typ">NVARCHAR</span>(100) <span class="kw">NOT NULL</span>,
+    Email     <span class="typ">NVARCHAR</span>(200) <span class="kw">UNIQUE NOT NULL</span>,
+    CreatedAt <span class="typ">DATETIME</span> <span class="kw">DEFAULT</span> GETDATE()
+);</pre>
+
+      <h3>The four operations (CRUD)</h3>
+      <div class="tabs" data-tabs>
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="t3-c">CREATE</button>
+          <button class="tab-btn" data-tab="t3-r">READ</button>
+          <button class="tab-btn" data-tab="t3-u">UPDATE</button>
+          <button class="tab-btn" data-tab="t3-d">DELETE</button>
+        </div>
+        <div class="tab-content active" id="t3-c">
+<pre><span class="lang">SQL</span><span class="com">-- Insert a new row</span>
+<span class="kw">INSERT INTO</span> Users (Name, Email)
+<span class="kw">VALUES</span> (<span class="str">'Anon'</span>, <span class="str">'anon@example.com'</span>);</pre>
+        </div>
+        <div class="tab-content" id="t3-r">
+<pre><span class="lang">SQL</span><span class="com">-- Read everything</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Users;
+
+<span class="com">-- Read with a filter</span>
+<span class="kw">SELECT</span> Name, Email <span class="kw">FROM</span> Users
+<span class="kw">WHERE</span> Email <span class="kw">LIKE</span> <span class="str">'%@example.com'</span>
+<span class="kw">ORDER BY</span> CreatedAt <span class="kw">DESC</span>;</pre>
+        </div>
+        <div class="tab-content" id="t3-u">
+<pre><span class="lang">SQL</span><span class="com">-- Update a row (always include WHERE!)</span>
+<span class="kw">UPDATE</span> Users
+<span class="kw">SET</span> Name = <span class="str">'Anonymous'</span>
+<span class="kw">WHERE</span> Id = <span class="num">1</span>;</pre>
+        </div>
+        <div class="tab-content" id="t3-d">
+<pre><span class="lang">SQL</span><span class="com">-- Delete a row</span>
+<span class="kw">DELETE FROM</span> Users
+<span class="kw">WHERE</span> Id = <span class="num">1</span>;</pre>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-label">⚠ The painful lesson</div>
+        Always include <code>WHERE</code> with <code>UPDATE</code> and <code>DELETE</code>. Without it, you change every row in the table. Test on <code>SELECT</code> first.
+      </div>
+    </section>
+
+    <!-- ============ 10 JOINS ============ -->
+    <section id="joins">
+      <h2><span class="num">// 10</span>Joins — combining tables</h2>
+      <p>Real apps have many related tables. A <code>JOIN</code> stitches them together using a shared key.</p>
+
+      <h3>The setup: two tables</h3>
+<pre><span class="lang">SQL</span><span class="com">-- Each Todo belongs to one User (UserId is the foreign key)</span>
+<span class="kw">CREATE TABLE</span> Todos (
+    Id     <span class="typ">INT</span> <span class="kw">PRIMARY KEY IDENTITY</span>(1,1),
+    Title  <span class="typ">NVARCHAR</span>(200) <span class="kw">NOT NULL</span>,
+    UserId <span class="typ">INT</span> <span class="kw">NOT NULL FOREIGN KEY REFERENCES</span> Users(Id)
+);</pre>
+
+      <h3>INNER JOIN — only matching rows</h3>
+<pre><span class="lang">SQL</span><span class="com">-- Get every todo together with the owner's name</span>
+<span class="kw">SELECT</span> t.Title, u.Name
+<span class="kw">FROM</span> Todos t
+<span class="kw">INNER JOIN</span> Users u <span class="kw">ON</span> t.UserId = u.Id;</pre>
+
+      <h3>LEFT JOIN — keep all rows from the left side</h3>
+<pre><span class="lang">SQL</span><span class="com">-- Every user, even those with zero todos</span>
+<span class="kw">SELECT</span> u.Name, t.Title
+<span class="kw">FROM</span> Users u
+<span class="kw">LEFT JOIN</span> Todos t <span class="kw">ON</span> t.UserId = u.Id;</pre>
+
+      <details>
+        <summary>What is "normalization"?</summary>
+        <p>Splitting data into multiple tables to avoid repetition. If we kept the user's name in every Todo row, changing the name would mean updating many rows. By keeping users in their own table and using a <strong>foreign key</strong>, we store each fact once.</p>
+        <ul>
+          <li><strong>1NF:</strong> each cell holds a single value (no comma-separated lists)</li>
+          <li><strong>2NF:</strong> non-key columns depend on the whole primary key</li>
+          <li><strong>3NF:</strong> non-key columns depend only on the key, nothing else</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- ============ 11 SQL PLAYGROUND ============ -->
+    <section id="playground">
+      <h2><span class="num">// 11</span>SQL Playground — try it live</h2>
+      <p>This runs a tiny in-browser SQL simulator on a fixed Users + Todos dataset. It supports <code>SELECT … FROM … WHERE … ORDER BY</code> and <code>INNER JOIN</code> on these two tables.</p>
+
+      <div class="sql-play">
+        <h4>Try a query:</h4>
+        <textarea id="sqlInput">SELECT Name, Email FROM Users WHERE Id = 2;</textarea>
+        <button onclick="runSql()">▶ Run query</button>
+        <div class="sql-hint">Try: <code>SELECT * FROM Todos;</code> · <code>SELECT t.Title, u.Name FROM Todos t INNER JOIN Users u ON t.UserId = u.Id;</code></div>
+        <div class="sql-result" id="sqlResult">— results will appear here —</div>
+      </div>
+    </section>
+
+    <!-- ============ 12 EF CORE ============ -->
+    <section id="ef">
+      <h2><span class="num">// 12</span>Entity Framework Core — C# meets SQL</h2>
+      <p>Writing raw SQL from C# is tedious. <strong>EF Core</strong> is an <em>ORM</em> (Object-Relational Mapper) — it lets you work with C# objects, and translates to SQL behind the scenes.</p>
+
+      <h3>The four-step pattern</h3>
+
+<pre><span class="lang">terminal</span><span class="com"># Install EF Core packages</span>
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.Design</pre>
+
+<pre><span class="lang">C#</span><span class="com">// Step 1: Define your entity (matches a table)</span>
+<span class="kw">public class</span> <span class="typ">Todo</span> {
+    <span class="kw">public int</span> Id { <span class="kw">get; set;</span> }
+    <span class="kw">public string</span> Title { <span class="kw">get; set;</span> } = <span class="str">""</span>;
+    <span class="kw">public bool</span> IsDone { <span class="kw">get; set;</span> }
+}
+
+<span class="com">// Step 2: Create a DbContext (your bridge to the DB)</span>
+<span class="kw">public class</span> <span class="typ">AppDbContext</span> : <span class="typ">DbContext</span> {
+    <span class="kw">public</span> AppDbContext(<span class="typ">DbContextOptions</span>&lt;<span class="typ">AppDbContext</span>&gt; opts) : <span class="kw">base</span>(opts) {}
+
+    <span class="com">// Each DbSet&lt;T&gt; becomes a table</span>
+    <span class="kw">public</span> <span class="typ">DbSet</span>&lt;<span class="typ">Todo</span>&gt; Todos =&gt; <span class="typ">Set</span>&lt;<span class="typ">Todo</span>&gt;();
+}
+
+<span class="com">// Step 3: Register it in Program.cs (with connection string)</span>
+builder.Services.AddDbContext&lt;<span class="typ">AppDbContext</span>&gt;(opts =&gt;
+    opts.UseSqlServer(builder.Configuration.GetConnectionString(<span class="str">"Default"</span>))
+);
+
+<span class="com">// Step 4: Inject it into a controller and query</span>
+<span class="kw">public class</span> <span class="typ">TodosController</span> : <span class="typ">ControllerBase</span> {
+    <span class="kw">private readonly</span> <span class="typ">AppDbContext</span> _db;
+    <span class="kw">public</span> TodosController(<span class="typ">AppDbContext</span> db) =&gt; _db = db;
+
+    [<span class="typ">HttpGet</span>]
+    <span class="kw">public async</span> <span class="typ">Task</span>&lt;<span class="typ">IActionResult</span>&gt; GetAll() {
+        <span class="kw">var</span> todos = <span class="kw">await</span> _db.Todos.ToListAsync();   <span class="com">// SELECT * FROM Todos</span>
+        <span class="kw">return</span> Ok(todos);
+    }
+
+    [<span class="typ">HttpPost</span>]
+    <span class="kw">public async</span> <span class="typ">Task</span>&lt;<span class="typ">IActionResult</span>&gt; Create([<span class="typ">FromBody</span>] <span class="typ">Todo</span> todo) {
+        _db.Todos.Add(todo);
+        <span class="kw">await</span> _db.SaveChangesAsync();              <span class="com">// INSERT INTO Todos</span>
+        <span class="kw">return</span> CreatedAtAction(nameof(GetAll), <span class="kw">new</span> { id = todo.Id }, todo);
+    }
+}</pre>
+
+      <h3>The connection string</h3>
+<pre><span class="lang">JSON</span><span class="com">// appsettings.json — keep secrets out of source control in real projects</span>
+{
+  <span class="str">"ConnectionStrings"</span>: {
+    <span class="str">"Default"</span>: <span class="str">"Server=localhost;Database=TodoApp;Trusted_Connection=True;TrustServerCertificate=True;"</span>
+  }
+}</pre>
+
+      <h3>Migrations — keeping schema in sync</h3>
+<pre><span class="lang">terminal</span><span class="com"># Generate a migration from your C# models</span>
+dotnet ef migrations add InitialCreate
+
+<span class="com"># Apply it to the database (creates tables)</span>
+dotnet ef database update</pre>
+
+      <div class="callout tip">
+        <div class="callout-label">★ On macOS / Apple Silicon</div>
+        SQL Server runs natively only via Docker on Apple Silicon. For local dev, many .NET devs on Mac use <strong>SQLite</strong> (replace <code>UseSqlServer</code> with <code>UseSqlite</code>) or <strong>PostgreSQL</strong> (Npgsql package). EF Core works with all of them — same C# code, different provider.
+      </div>
+    </section>
+
+    <!-- ============ 13 PROJECT ============ -->
+    <section id="project">
+      <h2><span class="num">// 13</span>Mini project: a Todo API end-to-end</h2>
+      <p>Putting every piece together. Imagine a user typing in a task in the browser:</p>
+
+      <div class="card">
+        <h4>The journey of one click</h4>
+        <ol>
+          <li><strong>User</strong> types "Buy groceries" and clicks Save in the browser.</li>
+          <li><strong>Frontend JS</strong> calls <code>fetch("/api/todos", { method:"POST", body:... })</code>.</li>
+          <li><strong>ASP.NET Core</strong> receives the request, routes it to <code>TodosController.Create</code>.</li>
+          <li><strong>Controller</strong> validates input, asks <code>AppDbContext</code> to add the row.</li>
+          <li><strong>EF Core</strong> generates <code>INSERT INTO Todos…</code> and runs it.</li>
+          <li><strong>SQL Server</strong> stores the row, returns the new Id.</li>
+          <li><strong>Controller</strong> returns <code>201 Created</code> with the saved object as JSON.</li>
+          <li><strong>Frontend</strong> reads the JSON, updates the on-screen list. Done.</li>
+        </ol>
+      </div>
+
+      <h3>Try it yourself — the build order</h3>
+      <ol>
+        <li><code>dotnet new webapi -n TodoApi</code></li>
+        <li>Add EF Core packages (SQLite is easiest on Mac M4)</li>
+        <li>Create <code>Todo.cs</code> model + <code>AppDbContext.cs</code></li>
+        <li>Wire up DI in <code>Program.cs</code></li>
+        <li>Create <code>TodosController.cs</code> with GET / POST / PUT / DELETE</li>
+        <li>Run <code>dotnet ef migrations add Init</code> + <code>dotnet ef database update</code></li>
+        <li>Open Swagger UI and test each endpoint</li>
+        <li>Build a tiny <code>index.html</code> page that calls the API with <code>fetch</code></li>
+      </ol>
+    </section>
+
+    <!-- ============ 14 QUIZ ============ -->
+    <section id="quiz">
+      <h2><span class="num">// 14</span>Test yourself</h2>
+      <p>Five quick questions. Click an answer.</p>
+
+      <div class="quiz" data-quiz>
+        <div class="quiz-q">1. Why should the frontend never talk directly to the database?</div>
+        <button class="quiz-opt" data-correct="false">It's slower than going through the backend.</button>
+        <button class="quiz-opt" data-correct="true">Anyone could read or change the data; security and validation must live on the backend.</button>
+        <button class="quiz-opt" data-correct="false">Browsers can't speak SQL.</button>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="quiz-q">2. Which HTTP method is used to create a new resource?</div>
+        <button class="quiz-opt" data-correct="false">GET</button>
+        <button class="quiz-opt" data-correct="true">POST</button>
+        <button class="quiz-opt" data-correct="false">DELETE</button>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="quiz-q">3. In ASP.NET Core, what does <code>[ApiController]</code> do?</div>
+        <button class="quiz-opt" data-correct="false">It connects to the database.</button>
+        <button class="quiz-opt" data-correct="true">Marks the class as a Web API controller and enables automatic JSON binding + 400 responses for invalid input.</button>
+        <button class="quiz-opt" data-correct="false">Generates Swagger UI.</button>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="quiz-q">4. What is the most common DI lifetime in ASP.NET Core?</div>
+        <button class="quiz-opt" data-correct="false">Singleton</button>
+        <button class="quiz-opt" data-correct="true">Scoped (one instance per HTTP request)</button>
+        <button class="quiz-opt" data-correct="false">Transient</button>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <div class="quiz-q">5. What's the danger of running <code>UPDATE Users SET Name='X'</code> with no WHERE clause?</div>
+        <button class="quiz-opt" data-correct="false">It will fail with a syntax error.</button>
+        <button class="quiz-opt" data-correct="false">It only updates the first row.</button>
+        <button class="quiz-opt" data-correct="true">It rewrites every row in the table.</button>
+        <div class="quiz-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ============ 15 NEXT ============ -->
+    <section id="next">
+      <h2><span class="num">// 15</span>What to learn next</h2>
+      <ol>
+        <li><strong>Authentication & authorization</strong> — JWT tokens, ASP.NET Core Identity</li>
+        <li><strong>A frontend framework</strong> — pick one: React, Vue, or Blazor (C# in the browser)</li>
+        <li><strong>Async patterns in C#</strong> — <code>async</code>/<code>await</code> deeply</li>
+        <li><strong>LINQ</strong> — querying collections (and EF Core) elegantly</li>
+        <li><strong>Testing</strong> — xUnit for unit tests, integration tests with WebApplicationFactory</li>
+        <li><strong>Deployment</strong> — Docker, then Azure App Service or AWS</li>
+        <li><strong>Caching</strong> — in-memory caching, then Redis when scaling</li>
+        <li><strong>Logging & observability</strong> — Serilog, OpenTelemetry</li>
+      </ol>
+      <div class="callout">
+        <div class="callout-label">★ Final word</div>
+        Build small things. A todo app, a bookmark manager, a habit tracker. Each one teaches you more than a tutorial because you'll hit real bugs and have to solve them. The fog clears one project at a time.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  Built as a <span class="accent">field guide</span> · Verify everything in production code · v1.0
+</footer>
+
+<script>
+/* ---------- TABS ---------- */
+document.querySelectorAll('[data-tabs]').forEach(box => {
+  // get all buttons and contents within this tab group
+  const btns = box.querySelectorAll('.tab-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // deactivate all buttons and contents in this group
+      box.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      box.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      // activate the clicked one
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+});
+
+/* ---------- QUIZ ---------- */
+document.querySelectorAll('[data-quiz]').forEach(quiz => {
+  const opts = quiz.querySelectorAll('.quiz-opt');
+  const fb = quiz.querySelector('.quiz-feedback');
+  opts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      // disable further clicks once answered
+      opts.forEach(o => o.disabled = true);
+      const correct = opt.dataset.correct === 'true';
+      // highlight clicked option
+      opt.classList.add(correct ? 'correct' : 'wrong');
+      // also reveal the correct one if user got it wrong
+      if (!correct) {
+        opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+      }
+      fb.textContent = correct ? '✓ Correct!' : '✗ Not quite — the right answer is highlighted in green.';
+      fb.style.color = correct ? '#3a8a5c' : '#c43c3c';
+    });
+  });
+});
+
+/* ---------- TINY SQL SIMULATOR ---------- */
+// Fixed in-memory dataset for the playground
+const DB = {
+  Users: [
+    { Id: 1, Name: 'Anon',   Email: 'anon@example.com',   CreatedAt: '2026-01-10' },
+    { Id: 2, Name: 'Priya',  Email: 'priya@example.com',  CreatedAt: '2026-02-04' },
+    { Id: 3, Name: 'Rahul',  Email: 'rahul@example.com',  CreatedAt: '2026-03-15' },
+    { Id: 4, Name: 'Maya',   Email: 'maya@example.com',   CreatedAt: '2026-04-01' }
+  ],
+  Todos: [
+    { Id: 1, Title: 'Learn HTTP',     UserId: 1, IsDone: 1 },
+    { Id: 2, Title: 'Build API',      UserId: 1, IsDone: 0 },
+    { Id: 3, Title: 'Write SQL',      UserId: 2, IsDone: 1 },
+    { Id: 4, Title: 'Try EF Core',    UserId: 2, IsDone: 0 },
+    { Id: 5, Title: 'Deploy to Azure',UserId: 3, IsDone: 0 }
+  ]
+};
+
+// Render a result set as an HTML table
+function renderTable(rows) {
+  if (!rows.length) return '<em>(no rows)</em>';
+  const cols = Object.keys(rows[0]);
+  let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>' + cols.map(c => `<td>${r[c] ?? ''}</td>`).join('') + '</tr>';
+  });
+  return html + '</tbody></table>';
+}
+
+// Very small SQL-ish parser: SELECT cols FROM table [JOIN ...] [WHERE ...] [ORDER BY ...]
+function runSql() {
+  const raw = document.getElementById('sqlInput').value.trim().replace(/;$/, '');
+  const out = document.getElementById('sqlResult');
+  try {
+    // normalize whitespace and uppercase keywords for matching
+    const q = raw.replace(/\s+/g, ' ');
+    const upper = q.toUpperCase();
+
+    if (!upper.startsWith('SELECT')) throw new Error('Only SELECT queries are supported here.');
+
+    // match: SELECT <cols> FROM <table> [alias] [INNER JOIN <t2> [a2] ON ...] [WHERE ...] [ORDER BY ...]
+    const re = /^SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+(\w+))?(?:\s+INNER\s+JOIN\s+(\w+)(?:\s+(\w+))?\s+ON\s+(.+?))?(?:\s+WHERE\s+(.+?))?(?:\s+ORDER\s+BY\s+(.+?))?$/i;
+    const m = q.match(re);
+    if (!m) throw new Error('Could not parse query. Supported: SELECT cols FROM table [alias] [INNER JOIN t2 a2 ON ...] [WHERE ...] [ORDER BY ...]');
+
+    const [, colsRaw, t1, a1, t2, a2, onCond, whereCond, orderCond] = m;
+
+    // load main table
+    if (!DB[t1]) throw new Error(`Unknown table: ${t1}`);
+    let rows = DB[t1].map(r => ({ ...r }));
+    const alias1 = a1 || t1;
+
+    // handle JOIN
+    if (t2) {
+      if (!DB[t2]) throw new Error(`Unknown table: ${t2}`);
+      const alias2 = a2 || t2;
+      // parse "alias.col = alias.col"
+      const onMatch = onCond.match(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/);
+      if (!onMatch) throw new Error('JOIN ON must look like: a.col = b.col');
+      const [, la, lc, ra, rc] = onMatch;
+      // create joined rows with prefixed keys
+      const joined = [];
+      rows.forEach(r1 => {
+        DB[t2].forEach(r2 => {
+          // pick the correct sides based on aliases
+          const left  = la === alias1 ? r1[lc] : r2[lc];
+          const right = ra === alias1 ? r1[rc] : r2[rc];
+          if (left === right) {
+            const merged = {};
+            // prefix every key with alias to disambiguate
+            Object.entries(r1).forEach(([k,v]) => merged[`${alias1}.${k}`] = v);
+            Object.entries(r2).forEach(([k,v]) => merged[`${alias2}.${k}`] = v);
+            joined.push(merged);
+          }
+        });
+      });
+      rows = joined;
+    } else {
+      // when no join, prefix with alias for consistency in WHERE/ORDER parsing
+      rows = rows.map(r => {
+        const o = {};
+        Object.entries(r).forEach(([k,v]) => o[`${alias1}.${k}`] = v);
+        return o;
+      });
+    }
+
+    // helper: resolve "alias.col" or bare "col" against a row
+    function getVal(row, ref) {
+      if (ref.includes('.')) return row[ref];
+      // bare column: try with main alias first, then any alias
+      const direct = row[`${alias1}.${ref}`];
+      if (direct !== undefined) return direct;
+      const k = Object.keys(row).find(key => key.endsWith('.' + ref));
+      return k ? row[k] : undefined;
+    }
+
+    // WHERE filter — supports col = value, col LIKE 'pattern', col > num etc
+    if (whereCond) {
+      const w = whereCond.trim();
+      // try operators in order of length to avoid mismatch
+      const ops = [' LIKE ', '>=', '<=', '<>', '!=', '=', '>', '<'];
+      let parsed = null;
+      for (const op of ops) {
+        const idx = w.toUpperCase().indexOf(op.toUpperCase());
+        if (idx > -1) {
+          parsed = { col: w.slice(0, idx).trim(), op: op.trim().toUpperCase(), val: w.slice(idx + op.length).trim() };
+          break;
+        }
+      }
+      if (!parsed) throw new Error('Unsupported WHERE clause');
+
+      // strip quotes from string literal values
+      let val = parsed.val;
+      if ((val.startsWith("'") && val.endsWith("'")) || (val.startsWith('"') && val.endsWith('"'))) {
+        val = val.slice(1, -1);
+      } else if (!isNaN(Number(val))) {
+        val = Number(val);
+      }
+
+      rows = rows.filter(r => {
+        const cell = getVal(r, parsed.col);
+        switch (parsed.op) {
+          case '=':  return cell == val;
+          case '!=':
+          case '<>': return cell != val;
+          case '>':  return cell > val;
+          case '<':  return cell < val;
+          case '>=': return cell >= val;
+          case '<=': return cell <= val;
+          case 'LIKE': {
+            // convert SQL LIKE pattern to regex
+            const pattern = String(val).replace(/%/g, '.*').replace(/_/g, '.');
+            return new RegExp('^' + pattern + '$', 'i').test(String(cell));
+          }
+        }
+      });
+    }
+
+    // ORDER BY — supports "col [ASC|DESC]"
+    if (orderCond) {
+      const parts = orderCond.trim().split(/\s+/);
+      const col = parts[0];
+      const dir = (parts[1] || 'ASC').toUpperCase();
+      rows.sort((a,b) => {
+        const va = getVal(a, col), vb = getVal(b, col);
+        if (va < vb) return dir === 'ASC' ? -1 : 1;
+        if (va > vb) return dir === 'ASC' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // SELECT projection — pick the requested columns
+    const cols = colsRaw.split(',').map(c => c.trim());
+    let projected;
+    if (cols.length === 1 && cols[0] === '*') {
+      // strip the alias prefix when it's a single-table query for nicer output
+      projected = rows.map(r => {
+        const o = {};
+        Object.entries(r).forEach(([k,v]) => {
+          o[t2 ? k : k.split('.')[1]] = v;
+        });
+        return o;
+      });
+    } else {
+      projected = rows.map(r => {
+        const o = {};
+        cols.forEach(c => {
+          // display name = bare column or alias.col
+          const display = c.includes('.') ? c : c;
+          o[display] = getVal(r, c);
+        });
+        return o;
+      });
+    }
+
+    out.innerHTML = `<div style="margin-bottom:.5rem;color:#3a8a5c">✓ ${projected.length} row(s)</div>` + renderTable(projected);
+  } catch (err) {
+    out.innerHTML = `<div class="sql-error">✗ ${err.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>
